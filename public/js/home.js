@@ -1,66 +1,60 @@
-// Inicializa o modal do Bootstrap
-const myModal = new bootstrap.Modal(document.getElementById("transactions-modal"));
-
-// Obtém o estado de login das sessões de armazenamento
+const myModal = new bootstrap.Modal("#transaction-modal");
 let logged = sessionStorage.getItem("logged");
 const session = localStorage.getItem("session");
 
 let data = {
-    login: logged,
     transactions: []
 };
 
-// Adiciona o listener para o botão de logout
 document.getElementById("button-logout").addEventListener("click", logout);
 
-// Adicionar lançamento
-document.getElementById("transactions-form").addEventListener("submit", function (e) {
+document.getElementById("transactions-button").addEventListener("click", function() {
+    window.location.href = "transactions.html";
+})
+
+// ADICIONAR LANÇAMENTO
+document.getElementById("transaction-form").addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const value = parseFloat(document.getElementById("value-input").value);
+    const value = parseFloat(document.getElementById("value-input").value); //parseFloat - transforma o número que possa ter virgula
     const description = document.getElementById("description-input").value;
     const date = document.getElementById("date-input").value;
-    const type = document.querySelector('input[name="type-input"]:checked').value;
+    const type = document.querySelector('input[name="type-input"]:checked').value; // pegar o que está checkado
 
-    data.transactions.unshift({
+    data.transactions.unshift ({ // unshift - add o valor na parte de cima da lista
         value: value,
-        type: type,
-        description: description,
+        type: type, 
+        description: description, 
         date: date
     });
 
-    savedata(data);
+    saveData(data);
     e.target.reset();
     myModal.hide();
 
     getCashIn();
     getCashOut();
-    getTotal()
+    getTotal();
 
-    alert("Lançamento adicionado com sucesso");
+    alert("Lançamento adicionado com sucesso.");
 });
 
-// Verifica o estado de login do usuário
 checkLogged();
 
 function checkLogged() {
-    if (session) {
-        // Se houver uma sessão, define o estado de login na sessionStorage
+    if(session) {
         sessionStorage.setItem("logged", session);
         logged = session;
     }
 
-    // Se não estiver logado, redireciona para a página de login
-    if (!logged) {
+    if(!logged) {        
         window.location.href = "index.html";
         return;
     }
 
-    const datauser = localStorage.getItem(logged);
-    if (datauser) {
-        data = JSON.parse(datauser);
-        data.login = logged;
-        console.log(data);
+    const dataUser = localStorage.getItem(logged);
+    if(dataUser){
+        data = JSON.parse(dataUser);
     }
 
     getCashIn();
@@ -68,109 +62,109 @@ function checkLogged() {
     getTotal();
 }
 
+// FUNÇÃO LOGOUT
 function logout() {
     sessionStorage.removeItem("logged");
     localStorage.removeItem("session");
+
     window.location.href = "index.html";
 }
 
+// FUNÇÃO QUE MOSTRA AS ENTRADAS NA TELA
 function getCashIn() {
     const transactions = data.transactions;
 
     const cashIn = transactions.filter((item) => item.type === "1");
 
-    if (cashIn.length) {
+    if(cashIn.length) {
         let cashInHtml = ``;
-        let limit = cashIn.length > 5 ? 5 : cashIn.length;
+        let limit = 0;
+
+        if (cashIn.length > 5) {
+            limit = 5;
+        } else {
+            limit = cashIn.length;
+        }
 
         for (let index = 0; index < limit; index++) {
-            const transaction = cashIn[index];
             cashInHtml += `
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h3 class="fs-2">R$ ${transaction.value.toFixed(2)}</h3>
-                        <div class="container p-0">
-                            <div class="row">
-                                <div class="col-12 col-md-8">
-                                    <p>${transaction.description}</p>
-                                </div>
-                                <div class="col-12 col-md-3 d-flex justify-content-end">
-                                    ${transaction.date}
-                                </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="fs-2">R$ ${cashIn[index].value.toFixed(2)}</h3>
+                    <div class="container p-0">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <p>${cashIn[index].description}</p>
+                            </div>
+                            <div class="col-12 col-md-3 d-flex justify-content-end">
+                                ${cashIn[index].date}
                             </div>
                         </div>
                     </div>
                 </div>
-            `;
+            </div>
+            `            
         }
 
-        document.getElementById("cash-in-list").innerHTML=cashInHtml;
-
-        document.getElementById("cash-in-container").innerHTML = cashInHtml;
+        document.getElementById("cash-in-list").innerHTML = cashInHtml;
     }
 }
 
-
-
-
+// FUNÇÃO QUE MOSTRA AS SAÍDAS NA TELA
 function getCashOut() {
     const transactions = data.transactions;
 
     const cashOut = transactions.filter((item) => item.type === "2");
 
-    if (cashOut.length) {
+    if(cashOut.length) {
         let cashOutHtml = ``;
-        let limit = cashOut.length > 5 ? 5 : cashOut.length;
+        let limit = 0;
+
+        if (cashOut.length > 5) {
+            limit = 5;
+        } else {
+            limit = cashOut.length;
+        }
 
         for (let index = 0; index < limit; index++) {
-            const transaction = cashOut[index];
             cashOutHtml += `
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h3 class="fs-2">R$ ${transaction.value.toFixed(2)}</h3>
-                        <div class="container p-0">
-                            <div class="row">
-                                <div class="col-12 col-md-8">
-                                    <p>${transaction.description}</p>
-                                </div>
-                                <div class="col-12 col-md-3 d-flex justify-content-end">
-                                    ${transaction.date}
-                                </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="fs-2">R$ ${cashOut[index].value.toFixed(2)}</h3>
+                    <div class="container p-0">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <p>${cashOut[index].description}</p>
+                            </div>
+                            <div class="col-12 col-md-3 d-flex justify-content-end">
+                                ${cashOut[index].date}
                             </div>
                         </div>
                     </div>
                 </div>
-            `;
+            </div>
+            `            
         }
 
-        
-    
+        document.getElementById("cash-out-list").innerHTML = cashOutHtml;
+    }
 }
 
-    function getTotal() {
-        const transaction = data.transactions; 
+function getTotal() {
+    const transactions = data.transactions;
+    let total = 0;
 
-        
+    transactions.forEach((item) => {
+        if(item.type === "1") {
+            total += item.value;
+        } else {
+            total -= item.value;
+        }
+    });
 
-        transaction.forEach((item) => {
-            let total =0;
-            if(item.type === "1") {
-                total += item.value;
-            }  else {
-                total -= item.value
-            }
-        })
+    document.getElementById("total").innerHTML = `R$ ${total.toFixed(2)}`;
+}
 
-        document.getElementById("total").innerHTML = `R$ ${total.toFixed(2)} `; 
-    }
-
-        document.getElementById("cash-in-container").innerHTML = cashInHtml; 
-        document.getElementById("cash-out-list").innerHTML = cashOutHtml;
-    
-    }
-
-    function savedata(data) {
-        localStorage.setItem(data.login, JSON.stringify(data));
-    }
-
-    
+function saveData(data) {
+    localStorage.setItem(data.login, JSON.stringify(data));
+}
