@@ -163,6 +163,11 @@ function getTotal() {
     });
 
     document.getElementById("total").innerHTML = `R$ ${total.toFixed(2)}`;
+
+    // Verifica se o saldo está negativo e gera um alerta
+    if(total < 0) {
+        alert("Atenção: seu saldo está negativo!");
+    }
 }
 
 function saveData(data) {
